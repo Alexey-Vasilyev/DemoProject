@@ -7,7 +7,6 @@ Getting the project: git clone https://github.com/Alexey-Vasilyev/DemoProject
 
 Build and run:
 Open the WeatherInfoSystem.sln in VS 2017, build it and run (hit F5).
-Framework 4.7.1 SDK), build the solution (F6) and run it (F5).
 
 Time spent on the project: 4 hours
 
