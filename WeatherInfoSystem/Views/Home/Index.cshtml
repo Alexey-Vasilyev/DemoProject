@@ -1,0 +1,101 @@
+﻿@{
+    Page.Title = "Home Page";
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <h2>Welcome to our weather information system!</h2>
+        <p></p>
+        <p>Display temperature in:   <button id="btnUnit" class="btn btn-primary">Celcius</button></p>
+
+        <div id="weather-data" class="col-md-8">
+            @{
+            Html.RenderPartial("_WeatherDataView");
+            }
+        </div>
+        <div id="countdown">Getting weather data ...</div>
+        <p id="error-message" class="alert-danger"></p>
+    </div>
+</div>
+
+<script>
+    function isGeolocationSupported() {
+        displayError("");
+
+        var result = navigator.geolocation | true;
+        if (!result) {
+            displayError("Geolocation is not supported by your browser");
+        }
+
+        return result;
+    }
+
+    function displayWeatherData(callback)
+    {
+        navigator.geolocation.getCurrentPosition(setLocation, displayError);
+        callback();
+    }
+
+    function setLocation(location) {
+        var unit = $("#btnUnit").text();
+        if (unit == "undefined" || unit == "")
+            unit = "Celcius";
+        retrieveWeatherData(location.coords.latitude, location.coords.longitude, unit == 'Celcius' ? 0 : 1);
+    }
+
+    function retrieveWeatherData(latitude, longitude, unit) {
+        $("#weather-data").load("@Url.Action("GetWeatherData")" + "?latitude=" + latitude + "&longitude=" + longitude + "&unit=" + unit,
+            function (response, status, xhr) {
+                if (status == "error") {
+                    displayError(xhr.status + ": " + xhr.statusText);
+                }
+            }
+        );
+    }
+
+    function displayError(err) {
+        $("#error-message").text(err.message || err);
+    }
+
+    $(document).ready(function () {
+
+        if (!isGeolocationSupported())
+            return;
+
+        navigator.geolocation.getCurrentPosition(setLocation, displayError);
+
+        var start = Date.now();
+        displayWeatherData(countdown);
+
+        window.setInterval(function () {
+                    navigator.geolocation.getCurrentPosition(setLocation, displayError);
+            }, 60000);
+
+        $("#btnUnit").css("color", "white");
+        $("#btnUnit").click(
+            function () {
+                if ($(this).text() == "Celcius") {
+                    $(this).text("Farenheit");
+                    navigator.geolocation.getCurrentPosition(setLocation, displayError);
+                    start = Date.now();
+                }
+                else {
+                    $(this).text("Celcius");
+                    navigator.geolocation.getCurrentPosition(setLocation, displayError);
+                    start = Date.now();
+                }
+            }
+        );
+
+        function countdown() {
+            window.setInterval(function () {
+                var seconds = (60 - Math.floor((Date.now() - start) / 1000));
+                if (seconds >= 1)
+                    $("#countdown").text("Will be refreshed in " + seconds + " seconds");
+                else
+                    start = Date.now();
+            }, 1000)
+        }
+    });
+
+</script>

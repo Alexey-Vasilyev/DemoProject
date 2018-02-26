@@ -1,0 +1,20 @@
+﻿@model WeatherInfoSystem.Models.WeatherModel
+@if (Model != null)
+{
+    if (Model.Temperature.HasValue && Model.Humidity.HasValue)
+    {
+        <div id="divTUnit">
+            <p>Location: @(Model.City), @(Model.Country)</p>
+            <p>Temperature: @(Model.Temperature.Value)°</p>
+            <p>Humidity: @(Model.Humidity.Value)%</p>
+        </div>
+    }
+
+    <p>Condition: @Model.Condition</p>
+
+    foreach (var icon in Model.Icons)
+    {
+        <img src="@icon" />
+    }
+
+}
